@@ -1,6 +1,11 @@
 @extends('layouts.app')
 @section('page-style')
     <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+    <style>
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
 @endsection
 @section('contents')
     <!-- Content Header (Page header) -->
@@ -28,14 +33,33 @@
                         <div class="card-header">
                             <h3 class="card-title">Users</h3>
                             <div class="card-tools">
-                                <div class="input-group input-group-sm" style="width: 150px;">
-                                    <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-default">
-                                            <i class="fas fa-search"></i>
-                                        </button>
+                                <form id="frm_filter">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                                <select name="per_page" id="status" class="form-control frm_fields">
+                                                    <option {{ $request->per_page == '5' ? 'selected' : '' }} value="5">Per Page 5</option>
+                                                    <option {{ $request->per_page == '10' ? 'selected' : '' }} value="10">Per Page 10</option>
+                                                    <option {{ $request->per_page == '20' ? 'selected' : '' }} value="20">Per Page 20</option>
+                                                    <option {{ $request->per_page == '50' ? 'selected' : '' }} value="50">Per Page 50</option>
+                                                    <option {{ $request->per_page == '100' ? 'selected' : '' }} value="100">Per Page 100</option>
+                                                    <option {{ $request->per_page == '200' ? 'selected' : '' }} value="200">Per Page 200</option>
+                                                    <option {{ $request->per_page == '500' ? 'selected' : '' }} value="500">Per Page 500</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                                <input type="text" name="s" value="{{$request->s}}" class="form-control float-right frm_fields" placeholder="Search">
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-default">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -44,6 +68,7 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
+                                        <th>Profile</th>
                                         <th>First Name</th>
                                         <th>Last Name</th>
                                         <th>Email</th>
@@ -59,6 +84,19 @@
                                         @foreach ($users as $key => $user)
                                             <tr>
                                                 <td>{{ $user->id }}</td>
+                                                <td>
+                                                    @if (isset($user->profile_picture) && !empty($user->profile_picture))
+                                                        <img src="/{{ $user->profile_picture }}" class="img-circle elevation-2" height="40" width="40" />
+                                                    @else
+                                                        @if ($user->gender == 'M')
+                                                            <img src="/dist/img/avatar5.png" class="img-circle elevation-2" height="40" width="40" />
+                                                        @elseif ($user->gender == 'F')
+                                                            <img src="/dist/img/avatar2.png" class="img-circle elevation-2" height="40" width="40" />
+                                                        @else
+                                                            <img src="/dist/img/avatar.png" class="img-circle elevation-2" height="40" width="40" />
+                                                        @endif
+                                                    @endif
+                                                </td>
                                                 <td>{{ $user->first_name }}</td>
                                                 <td>{{ $user->last_name }}</td>
                                                 <td>{{ $user->email }}</td>
@@ -80,6 +118,9 @@
                         <!-- /.card-body -->
                     </div>
                     <!-- /.card -->
+                    <div class="d-flex justify-content-end">
+                        {{ $users->withQueryString()->links('pagination::bootstrap-4') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,4 +139,9 @@
             });
         </script>
     @endif
+    <script>
+        $(".frm_fields").on("change", function() {
+            $("#frm_filter").submit();
+        });
+    </script>
 @endsection

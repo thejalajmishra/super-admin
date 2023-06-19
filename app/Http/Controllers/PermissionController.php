@@ -12,10 +12,30 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $permissions = Permission::paginate(10);
+        $per_page = $request->per_page ?? 5;
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/permissions/lists",
+                'name' => "Permissions List"
+            ]
+        ];
+        $pageTitle = 'Permissions List';
+        $permissions = Permission::select('*');
+        if(isset($request->s) && !empty($request->s)){
+            $permissions = $permissions->where('name', $request->s);
+            $permissions = $permissions->orWhere('description', $request->s);
+        }
+        $permissions = $permissions->paginate($per_page);
         return view('permissions.lists', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
+            'request' => $request,
             'permissions' => $permissions
         ]);
     }

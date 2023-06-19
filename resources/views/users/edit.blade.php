@@ -1,4 +1,18 @@
 @extends('layouts.app')
+@section('page-style')
+    <style>
+        .custom-radio-section {
+            display: initial !important;
+            padding-left: 2.5rem;
+        }
+        .form-group .custom-radio-section:first-child {
+            padding-left: 1.5rem !important;
+        }
+        .form-group.pt-38 {
+            padding-top: 38px;
+        }
+    </style>
+@endsection
 @section('contents')
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -40,7 +54,7 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form name="frm_users_create" id="frm_users_create" action="{{ url('users/update/' . $users->id) }}" method="post">
+                        <form name="frm_users_create" id="frm_users_create" action="{{ url('users/update/' . $users->id) }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
@@ -95,11 +109,11 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="exampleInputFile">Profile Picture</label>
+                                            <label for="profile_picture">Profile Picture</label>
                                             <div class="input-group">
                                                 <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="exampleInputFile">
-                                                    <label class="custom-file-label" for="exampleInputFile">Choose Profile Picture</label>
+                                                    <input type="file" class="custom-file-input" name="profile_picture" id="profile_picture">
+                                                    <label class="custom-file-label" for="profile_picture">Choose Profile Picture</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -121,6 +135,28 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label>Gender</label><br>
+                                            <div class="custom-control custom-radio custom-radio-section" style="padding-left: 1.5rem;">
+                                                <input class="custom-control-input" type="radio" id="genderMale" {{$users->gender == 'M' ? 'checked' : ''}} value="M" name="gender" checked />
+                                                <label for="genderMale" class="custom-control-label">Male</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-radio-section">
+                                                <input class="custom-control-input" type="radio" id="genderFemale" {{$users->gender == 'F' ? 'checked' : ''}} value="F" name="gender" />
+                                                <label for="genderFemale" class="custom-control-label">Female</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-radio-section">
+                                                <input class="custom-control-input" type="radio" id="genderOther" {{$users->gender == 'O' ? 'checked' : ''}} value="O" name="gender" />
+                                                <label for="genderOther" class="custom-control-label">Other</label>
+                                            </div>
+                                            @error('gender')
+                                                <span id="gender-error" class="error invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label for="role">Role</label>
                                             <select name="role" id="role" class="form-control @error('role') is-invalid @enderror">
                                                 <option value="">Select Option</option>
@@ -132,6 +168,17 @@
                                             </select>
                                             @error('role')
                                                 <span id="role-error" class="error invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group pt-38">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox" name="login_allowed" id="login_allowed" {{$users->login_allowed == '1' ? 'checked' : ''}} value="1">
+                                                <label for="login_allowed" class="custom-control-label">Allow Login</label>
+                                            </div>
+                                            @error('login_allowed')
+                                                <span id="login_allowed-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     </div>

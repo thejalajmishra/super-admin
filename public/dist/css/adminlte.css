@@ -53015,3 +53015,7 @@ a.text-muted:hover {
   -webkit-text-fill-color: #000 !important;
   color: #000 !important;
 }
+
+.notifications_dropdown_menu .dropdown-item {
+  white-space: inherit !important;
+}
