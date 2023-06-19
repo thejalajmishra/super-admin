@@ -6,6 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Notifications\RoleCreatedSuccessful;
+use Illuminate\Support\Facades\Notification;
+use Mail;
 
 class RoleController extends Controller
 {
@@ -14,8 +17,28 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = Role::all();
+        $per_page = $request->per_page ?? 5;
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/roles/lists",
+                'name' => "Roles List"
+            ]
+        ];
+        $pageTitle = 'Roles List';
+        $roles = Role::select('*');
+        if(isset($request->s) && !empty($request->s)){
+            $roles = $roles->where('name', $request->s);
+            $roles = $roles->orWhere('description', $request->s);
+        }
+        $roles = $roles->paginate($per_page);
         return view('roles.lists', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
+            'request' => $request,
             'roles' => $roles
         ]);
     }
@@ -25,7 +48,25 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return view('roles.create');
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/roles/lists",
+                'name' => "Roles List"
+            ],
+            [
+                'link' => "/roles/create",
+                'name' => "Roles Create"
+            ]
+        ];
+        $pageTitle = 'Roles Create';
+        return view('roles.create', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
+        ]);
     }
 
     /**
@@ -44,6 +85,11 @@ class RoleController extends Controller
             'description'=> $request->description, 
             'guard_name' => $request->guard_name
         ]);
+
+        $superadminRole = Role::where('name', 'superadmin')->first();
+        $users = User::role($superadminRole)->get();
+
+        Notification::send($users, new RoleCreatedSuccessful($request->name));
 
         return redirect('roles/lists');
     }

@@ -1,4 +1,18 @@
 @extends('layouts.app')
+@section('page-style')
+    <style>
+        .custom-radio-section {
+            display: initial !important;
+            padding-left: 2.5rem;
+        }
+        .form-group .custom-radio-section:first-child {
+            padding-left: 1.5rem !important;
+        }
+        .form-group.pt-38 {
+            padding-top: 38px;
+        }
+    </style>
+@endsection
 @section('contents')
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -40,14 +54,14 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form name="frm_users_create" id="frm_users_create" action="{{ url('users/store') }}" method="post">
+                        <form name="frm_users_create" id="frm_users_create" action="{{ url('users/store') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="first_name">First Name</label>
-                                            <input type="text" name="first_name" id="first_name" value="{{old('first_name')}}" class="form-control @error('first_name') is-invalid @enderror" placeholder="Enter First Name here">
+                                            <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}" class="form-control @error('first_name') is-invalid @enderror" placeholder="Enter First Name here">
                                             @error('first_name')
                                                 <span id="first_name-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -56,7 +70,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="last_name">Last Name</label>
-                                            <input type="text" name="last_name" id="last_name" value="{{old('last_name')}}" class="form-control @error('last_name') is-invalid @enderror" placeholder="Enter Last Name here">
+                                            <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}" class="form-control @error('last_name') is-invalid @enderror" placeholder="Enter Last Name here">
                                             @error('last_name')
                                                 <span id="last_name-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -67,7 +81,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="email">Email address</label>
-                                            <input type="email" name="email" id="email" value="{{old('email')}}" class="form-control @error('email') is-invalid @enderror" placeholder="Enter email here">
+                                            <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Enter email here">
                                             @error('email')
                                                 <span id="email-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -76,7 +90,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="mobile">Mobile Number</label>
-                                            <input type="tel" name="mobile" id="mobile" value="{{old('mobile')}}" class="form-control @error('mobile') is-invalid @enderror" placeholder="Enter Mobile Number here">
+                                            <input type="tel" name="mobile" id="mobile" value="{{ old('mobile') }}" class="form-control @error('mobile') is-invalid @enderror" placeholder="Enter Mobile Number here">
                                             @error('mobile')
                                                 <span id="mobile-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -87,7 +101,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Password</label>
-                                            <input type="password" name="password" id="password" value="{{old('password')}}" class="form-control @error('password') is-invalid @enderror" placeholder="Enter Password here">
+                                            <input type="password" name="password" id="password" value="{{ old('password') }}" class="form-control @error('password') is-invalid @enderror" placeholder="Enter Password here">
                                             @error('password')
                                                 <span id="password-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -95,11 +109,11 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="exampleInputFile">Profile Picture</label>
+                                            <label for="profile_picture">Profile Picture</label>
                                             <div class="input-group">
                                                 <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="exampleInputFile">
-                                                    <label class="custom-file-label" for="exampleInputFile">Choose Profile Picture</label>
+                                                    <input type="file" class="custom-file-input" name="profile_picture" id="profile_picture">
+                                                    <label class="custom-file-label" for="profile_picture">Choose Profile Picture</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,7 +123,8 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="status">Status</label>
-                                            <select name="status" id="status" class="form-control @error('status') is-invalid @enderror">
+                                            <select name="status" id="status"
+                                                class="form-control @error('status') is-invalid @enderror">
                                                 <option value="">Select Option</option>
                                                 <option {{ old('status') == '1' ? 'selected' : '' }} value="1">Active</option>
                                                 <option {{ old('status') == '0' ? 'selected' : '' }} value="0">In-Active</option>
@@ -121,18 +136,45 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label>Gender</label><br>
+                                            <div class="custom-control custom-radio custom-radio-section" style="padding-left: 1.5rem;">
+                                                <input class="custom-control-input" type="radio" id="genderMale" value="M" name="gender" checked />
+                                                <label for="genderMale" class="custom-control-label">Male</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-radio-section">
+                                                <input class="custom-control-input" type="radio" id="genderFemale" value="F" name="gender" />
+                                                <label for="genderFemale" class="custom-control-label">Female</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-radio-section">
+                                                <input class="custom-control-input" type="radio" id="genderOther" value="O" name="gender" />
+                                                <label for="genderOther" class="custom-control-label">Other</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label for="role">Role</label>
                                             <select name="role" id="role" class="form-control @error('role') is-invalid @enderror">
                                                 <option value="">Select Option</option>
-                                                @if($roles)
-                                                    @foreach($roles as $role)
-                                                        <option {{ old('role') == $role->id ? 'selected' : '' }} value="{{$role->id}}">{{$role->name}}</option>
+                                                @if ($roles)
+                                                    @foreach ($roles as $role)
+                                                        <option {{ old('role') == $role->id ? 'selected' : '' }} value="{{ $role->id }}">{{ $role->name }}</option>
                                                     @endforeach
                                                 @endif
                                             </select>
                                             @error('role')
                                                 <span id="role-error" class="error invalid-feedback">{{ $message }}</span>
                                             @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group pt-38">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox" name="login_allowed" id="login_allowed" value="1">
+                                                <label for="login_allowed" class="custom-control-label">Allow Login</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -155,7 +197,6 @@
     <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
     <script>
         $("form").attr('autocomplete', 'off');
-
         $(function() {
             $('#frm_users_create').validate({
                 rules: {

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Notifications\UserCreatedSuccessful;
+use Illuminate\Support\Facades\Notification;
 use Mail;
 
 class UserController extends Controller
@@ -20,8 +22,9 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $per_page = $request->per_page ?? 5;
         $breadcrumbs  = [
             [
                 'link' => "/dashboard",
@@ -33,11 +36,19 @@ class UserController extends Controller
             ]
         ];
         $pageTitle = 'Users List';
-        $users = User::with('roles')->get();
+        $users = User::with('roles');
+        if(isset($request->s) && !empty($request->s)){
+            $users = $users->where('first_name', $request->s);
+            $users = $users->orWhere('last_name', $request->s);
+            $users = $users->orWhere('email', $request->s);
+            $users = $users->orWhere('mobile', $request->s);
+        }
+        $users = $users->paginate($per_page);
         return view('users/lists', [
             'breadcrumbs' => $breadcrumbs,
             'pagetitle' => $pageTitle,
-            'users' => $users
+            'users' => $users,
+            'request' => $request
         ]);
     }
 
@@ -82,6 +93,7 @@ class UserController extends Controller
             'password' => 'required',
             'status' => 'required',
             'role' => 'required',
+            'file' => 'mimes:png,jpg,jpeg|max:2048'
         ]);
 
         $users = new User();
@@ -89,14 +101,28 @@ class UserController extends Controller
         $users->last_name = $request->last_name;
         $users->email = $request->email;
         $users->mobile = $request->mobile;
+        $users->gender = $request->gender;
         $users->password = Hash::make($request->password);
         $users->status = $request->status;
+        if($request->file('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $location = 'uploads/profile';
+            $file->move($location, $filename);
+            $users->profile_picture = $location.'/'.$filename;
+        }
+        $users->login_allowed = $request->login_allowed ?? 0;
         $users->save();
 
         if(isset($request->role)){
             $role = Role::find($request->role);
             $users->assignRole($role);
         }
+
+        $superadminRole = Role::where('name', 'superadmin')->first();
+        $users = User::role($superadminRole)->get();
+
+        Notification::send($users, new UserCreatedSuccessful($request->email));
 
         return redirect('users/lists')->with('message', "User created successfully.");
     }
@@ -144,6 +170,10 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // echo '<pre>';
+        // print_r($request->file('profile_picture'));
+        // exit;
+
         $request->validate([
             'first_name' => 'required',
             'last_name' => 'required',
@@ -158,10 +188,19 @@ class UserController extends Controller
         $users->last_name = $request->last_name;
         $users->email = $request->email;
         $users->mobile = $request->mobile;
+        $users->gender = $request->gender;
         if(isset($request->password) && !empty($request->password)){
             $users->password = Hash::make($request->password);
         }
         $users->status = $request->status;
+        if($request->file('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $location = 'uploads/profile';
+            $file->move($location, $filename);
+            $users->profile_picture = $location.'/'.$filename;
+        }
+        $users->login_allowed = $request->login_allowed ?? 0;
         $users->save();
 
         $users->roles()->detach();

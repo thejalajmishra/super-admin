@@ -1,96 +1,124 @@
 @extends('layouts.app')
+@section('page-style')
+    <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+@endsection
 @section('contents')
-    <x-slot name="header">
-        <div class="grid md:grid-cols-2 md:gap-6">
-            <div class="relative z-0 w-full group">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    {{ __('Roles') }}
-                </h2>
-            </div>
-            <div class="relative z-0 w-full group">
-                @can('roles create')
-                    <a href="{{ url('roles/create') }}"
-                        class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 mr-4 float-right">Add
-                        New Role</a>
-                @endcan
-            </div>
-        </div>
-    </x-slot>
-    <div class="py-12">
-        <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                <th scope="col" class="px-6 py-2">
-                                    #
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Name
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Description
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Guard
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Created On
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Updated On
-                                </th>
-                                <th scope="col" class="px-6 py-2">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($roles)
-                                @foreach ($roles as $key => $role)
-                                    <tr
-                                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td class="px-6 py-2">
-                                            {{ $key + 1 }}
-                                        </td>
-                                        <th scope="row"
-                                            class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {{ $role->name }}
-                                        </th>
-                                        <td class="px-6 py-2">
-                                            {{ $role->description }}
-                                        </td>
-                                        <td class="px-6 py-2">
-                                            {{ $role->guard_name }}
-                                        </td>
-                                        <td class="px-6 py-2">
-                                            {{ $role->created_at }}
-                                        </td>
-                                        <td class="px-6 py-2">
-                                            {{ $role->updated_at }}
-                                        </td>
-                                        <td class="flex items-center px-6 py-2 space-x-3">
-                                            @can('roles update')
-                                                <a href="{{ url('roles/' . $role->id . '/edit') }}"
-                                                    class="inline-flex items-center px-4 py-1 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 m-4">Edit</a>
-                                            @endcan
-                                            @can('roles delete')
-                                                <a href="{{ url('roles' . $role->id . '/delete') }}"
-                                                    class="inline-flex items-center justify-center px-4 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Remove</a>
-                                            @endcan
-                                            @can('roles permissions')
-                                                <a href="{{ url('roles/' . $role->id . '/permissions') }}"
-                                                    class="inline-flex items-center px-4 py-1 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 m-4">Permissions</a>
-                                            @endcan
-                                        </td>
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="m-0">{{$pagetitle??''}}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    {{-- @can('roles create') --}}
+                        <a href="{{ url('roles/create') }}" class="btn btn-success float-right">Add New <i class="nav-icon fas fa-plus"></i></a>
+                    {{-- @endcan --}}
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Roles</h3>
+                            <div class="card-tools">
+                                <form id="frm_filter">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                                <select name="per_page" id="status" class="form-control frm_fields">
+                                                    <option {{ $request->per_page == '5' ? 'selected' : '' }} value="5">Per Page 5</option>
+                                                    <option {{ $request->per_page == '10' ? 'selected' : '' }} value="10">Per Page 10</option>
+                                                    <option {{ $request->per_page == '20' ? 'selected' : '' }} value="20">Per Page 20</option>
+                                                    <option {{ $request->per_page == '50' ? 'selected' : '' }} value="50">Per Page 50</option>
+                                                    <option {{ $request->per_page == '100' ? 'selected' : '' }} value="100">Per Page 100</option>
+                                                    <option {{ $request->per_page == '200' ? 'selected' : '' }} value="200">Per Page 200</option>
+                                                    <option {{ $request->per_page == '500' ? 'selected' : '' }} value="500">Per Page 500</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                                <input type="text" name="s" value="{{$request->s}}" class="form-control float-right frm_fields" placeholder="Search">
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-default">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Guard</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    @if ($roles)
+                                		@foreach ($roles as $key => $role)
+                                            <tr>
+                                                <td>{{ $role->id }}</td>
+                                                <td>{{ $role->name }}</td>
+                                                <td>{{ $role->description }}</td>
+                                                <td>{{ $role->guard_name }}</td>
+                                                <td>{{ $role->created_at }}</td>
+                                                <td><span class="tag tag-success">Approved</span></td>
+                                                <td>
+                                                    <a href="{{ url('roles/' . $role->id . '/edit') }}" title="Edit Role"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                                    <a href="{{ url('roles/' . $role->id . '/delete') }}" title="Delete Role"><i class="fas fa-trash danger" aria-hidden="true"></i></a>
+                                                    <a href="{{ url('roles/' . $role->id . '/permissions') }}" title="Edit Role Permissions"><i class="fas fa-lock"></i></a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                    <div class="d-flex justify-content-end">
+                        {{ $roles->withQueryString()->links('pagination::bootstrap-4') }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+    <!-- /.content -->
+@endsection
+@section('page-script')
+    <!-- Toastr -->
+    <script src="/plugins/toastr/toastr.min.js"></script>
+    @if (session()->has('message'))
+        <script>
+            $(document).Toasts('create', {
+                title: 'Success',
+                position: 'topLeft',
+                body: '{{ session()->get('message') }}'
+            });
+        </script>
+    @endif
+    <script>
+        $(".frm_fields").on("change", function() {
+            $("#frm_filter").submit();
+        });
+    </script>
 @endsection

@@ -20,8 +20,7 @@
     <div class="wrapper">
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__wobble" src="/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60"
-                width="60">
+            <img class="animation__wobble" src="/dist/img/logo.png" alt="Super Admin" height="60" width="60">
         </div>
 
         <!-- Navbar -->
@@ -134,29 +133,28 @@
                     </div>
                 </li>
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
+                <li class="nav-item dropdown notifications_dropdown_menu">
+                    @if (auth()->user()->unreadNotifications)
+                        <a class="nav-link" data-toggle="dropdown" href="{{route('mark-as-read')}}">
+                            <i class="far fa-bell"></i>
+                            <span class="badge badge-warning navbar-badge">{{count(auth()->user()->unreadNotifications)}}</span>
+                        </a>
+                    @endif
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
+                        @if (auth()->user()->unreadNotifications)
+                            <span class="dropdown-item dropdown-header">{{count(auth()->user()->unreadNotifications)}} Notifications</span>
+                            <div class="dropdown-divider"></div>
+                        @endif
+                        
+                        @if (auth()->user()->unreadNotifications)
+                            @foreach (auth()->user()->unreadNotifications as $notification)
+                                <a href="{{url('/users/lists')}}" class="dropdown-item">
+                                    <i class="fas fa-user mr-2"></i> {{$notification->data['data']}}
+                                    <span class="float-right text-muted text-sm">3 mins</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                            @endforeach
+                        @endif
                         <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
                 </li>
@@ -191,10 +189,10 @@
 
         <!-- Main Footer -->
         <footer class="main-footer">
-            <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+            <strong>Copyright &copy; {{date('Y')}} <a href="https://superadmin.io">Super Admin</a>.</strong>
             All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 3.2.0
+                <b>Version</b> 1.0.0
             </div>
         </footer>
     </div>
@@ -221,8 +219,6 @@
 
     <!-- AdminLTE for demo purposes -->
     <script src="/dist/js/demo.js"></script>
-    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="/dist/js/pages/dashboard2.js"></script>
     @yield('page-script')
 </body>
 
