@@ -292,4 +292,10 @@ class UserController extends Controller
 
         return redirect('users/lists');
     }
+
+    public function search(Request $request) {
+        $results = User::search('jalaj')->get();
+
+        dd($results);
+    }
 }

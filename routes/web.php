@@ -24,7 +24,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 Route::get('/mark-as-read', [UserController::class, 'markAsRead'])->name('mark-as-read');
+Route::get('/search', [UserController::class, 'search'])->name('search');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
