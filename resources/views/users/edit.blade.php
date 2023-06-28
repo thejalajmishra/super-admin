@@ -22,9 +22,9 @@
                     <h1 class="m-0">{{ $pagetitle ?? '' }}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
-                    {{-- @can('users lists') --}}
-                    <a href="{{ url('users/lists') }}" class="btn btn-success float-right">List Users <i class="nav-icon fas fa-users"></i></a>
-                    {{-- @endcan --}}
+                    @can('users.index')
+                        <a href="{{ url('users/lists') }}" class="btn btn-success float-right">List Users <i class="nav-icon fas fa-users"></i></a>
+                    @endcan
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->

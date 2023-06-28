@@ -11,9 +11,9 @@
                     <h1 class="m-0">{{$pagetitle??''}}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
-                    {{-- @can('permissions create') --}}
+                    @can('permissions.create')
                         <a href="{{ url('permissions/create') }}" class="btn btn-success float-right">Add New <i class="nav-icon fas fa-plus"></i></a>
-                    {{-- @endcan --}}
+                    @endcan
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -79,11 +79,29 @@
                                                 <td>{{ $permission->name }}</td>
                                                 <td>{{ $permission->description }}</td>
                                                 <td>{{ $permission->guard_name }}</td>
-                                                <td>{{ $permission->created_at }}</td>
-                                                <td><span class="tag tag-success">Approved</span></td>
+                                                <td>{{ \Carbon\Carbon::parse($permission->created_at)->format('jS F Y g:i:s A')}}</td>
                                                 <td>
-                                                    <a href="{{ url('permissions/' . $permission->id . '/edit') }}" title="Edit Role"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                                                    <a href="{{ url('permissions/' . $permission->id . '/delete') }}" title="Delete Role"><i class="fas fa-trash danger" aria-hidden="true"></i></a>
+                                                    @if($permission->deleted_at != NULL)
+                                                        <div class="bg-danger color-palette text-center">
+                                                            <span>Deleted</span>
+                                                        </div>
+                                                    @elseif($permission->status != 1)
+                                                        <div class="bg-warning color-palette text-center">
+                                                            <span>In-Active</span>
+                                                        </div>
+                                                    @else
+                                                        <div class="bg-primary color-palette text-center">
+                                                            <span>Active</span>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @can('permissions.edit')
+                                                        <a href="{{ url('permissions/' . $permission->id . '/edit') }}" title="Edit Permission" class="btn btn-xs btn-info">Edit</a>
+                                                    @endcan
+                                                    @can('permissions.delete')
+                                                        <a href="{{ url('permissions/' . $permission->id . '/delete') }}" title="Delete Permission" class="btn btn-xs btn-danger" data-confirm-delete="true">Delete</a>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @endforeach

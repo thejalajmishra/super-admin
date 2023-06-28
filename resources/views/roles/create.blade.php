@@ -8,9 +8,9 @@
                     <h1 class="m-0">{{ $pagetitle ?? '' }}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
-                    {{-- @can('roles lists') --}}
+                    @can('roles.index')
                     <a href="{{ url('roles/lists') }}" class="btn btn-success float-right">List Roles <i class="nav-icon fas fa-users"></i></a>
-                    {{-- @endcan --}}
+                    @endcan
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->

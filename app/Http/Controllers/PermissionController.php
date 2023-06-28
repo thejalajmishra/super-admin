@@ -45,7 +45,25 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        return view('permissions.create');
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/permissions/lists",
+                'name' => "Permissions List"
+            ],
+            [
+                'link' => "/permissions/create",
+                'name' => "Permissions Create"
+            ]
+        ];
+        $pageTitle = 'Permissions Create';
+        return view('permissions.create', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
+        ]);
     }
 
     /**
@@ -62,7 +80,8 @@ class PermissionController extends Controller
         $role = Permission::create([
             'name' => $request->name, 
             'description'=> $request->description, 
-            'guard_name' => $request->guard_name
+            'guard_name' => $request->guard_name,
+            'status' => $request->status
         ]);
 
         return redirect('permissions/lists');
@@ -102,6 +121,7 @@ class PermissionController extends Controller
         $permission->name = $request->name; 
         $permission->description = $request->description;
         $permission->guard_name = $request->guard_name;
+        $permission->status = $request->status;
         $permission->save();
 
         return redirect('permissions/lists');
@@ -112,6 +132,12 @@ class PermissionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $permission = Permission::find($id);
+
+        if ($permission != null) {
+            $permission->delete($id);
+            return redirect()->back()->with('message', "Permission deleted successfully.");
+        }
+        return redirect()->route('dashboard')->with(['message'=> 'Wrong ID!!']);  
     }
 }

@@ -1,66 +1,87 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Role Permissions') }}
-        </h2>
-    </x-slot>
-    <div class="py-12">
-        <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
-                            <h2 class="text-md font-bold text-slate-900 mb-1">{{ $users->name }}</h2>
-                            <p class="text-sm font-semibold text-slate-900 mb-1">{{ $users->email }}</p>
-                            <p class="text-sm font-semibold text-slate-900 mb-5">{{ $users->mobile }}</p>
-                            <form action="{{ url('users/update-permissions', $users->id) }}" method="post">
-                                @csrf
+@extends('layouts.app')
+@section('page-style')
+    <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+@endsection
+@section('contents')
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="m-0">{{ $pagetitle ?? '' }}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    @can('permissions.index')
+                        <a href="{{ url('permissions/lists') }}" class="btn btn-success float-right">List Permissions <i class="nav-icon fas fa-users"></i></a>
+                    @endcan
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
 
+    @if (session()->has('message'))
+        <div class="pt-5 duration-300 ease-in-out">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-green-200 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+                    <p class="font-bold">Success</p>
+                    <p>{{ session()->get('message') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- left column -->
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"> Update "{{ $users->first_name }} {{ $users->last_name }}" Permissions Details</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <!-- form start -->
+                        <form name="frm_roles_create" id="frm_roles_create" action="{{ url('users/update-permissions', $users->id) }}" method="post">
+                            @csrf
+                            <div class="card-body">
                                 @if ($permissions)
                                     @foreach ($permissions as $key => $permission)
-                                        <div class="grid md:grid-cols-4 md:gap-6  mt-3">
-                                            <div class="relative z-0 w-full mb-1 group">
-                                                <div class="flex items-center mb-0">
-                                                    <label for="permission-{{ $key }}"
-                                                        class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                        {{ strtoupper($key) }}</label>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="permission-{{ $key }}">{{ strtoupper($key) }}</label>
                                         </div>
                                         @if ($permission)
-                                            <div class="grid md:grid-cols-8 md:gap-6 mt-2">
+                                            <div class="row">
                                                 @foreach ($permission as $key1 => $val)
-                                                    <div class="relative z-0 w-full group">
-                                                        <div class="flex items-center mb-3">
-                                                            <label
-                                                                for="permission-{{ $key }}-{{ $key1 }}"
-                                                                class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                                <input name="permissions[]"
-                                                                    id="permission-{{ $key }}-{{ $key1 }}"
-                                                                    {{ in_array($key . ' ' . $val, $user_permissions) ? 'checked' : '' }}
-                                                                    type="checkbox"
-                                                                    value="{{ $key }} {{ $val }}"
-                                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                                {{ count($permission) > 1 ? strtoupper($val) : strtoupper($key) }}</label>
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input" name="permissions[]" id="permission-{{ $key }}-{{ $key1 }}" {{ in_array($key.'.'.$val, $user_permissions) ? 'checked' : '' }} type="checkbox" value="{{ $key.'.'.$val }}">
+                                                                <label class="custom-control-label" for="permission-{{ $key }}-{{ $key1 }}">{{ count($permission) > 1 ? strtoupper($val) : strtoupper($key) }}</label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 @endforeach
                                             </div>
                                         @endif
-                                        <hr />
                                     @endforeach
                                 @endif
-
-                                <div class="relative z-0 w-full my-4 group">
-                                    <button type="submit"
-                                        class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Update
-                                        Permissions</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="reset" class="btn btn-primary">Reset</button>
+                            </div>
+                        </form>
                     </div>
+                    <!-- /.card -->
                 </div>
             </div>
         </div>
-    </div>
-</x-app-layout>
+    </section>
+    <!-- /.content -->
+@endsection
+@section('page-script')
+@endsection

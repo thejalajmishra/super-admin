@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\cr;
 use Illuminate\Http\Request;
+use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -12,6 +14,48 @@ class DashboardController extends Controller
      */
     public function index()
     {
+
+        // $output = [];
+        // exec('wmic cpu get loadpercentage', $output);
+
+        // $cpuUsage = trim($output[1]); // Extract the CPU usage percentage
+
+        // echo "CPU Usage: $cpuUsage%";
+
+        // $output = [];
+        // exec('wmic logicaldisk get deviceid,freespace,size', $output);
+
+        // $diskUsage = [];
+
+        // foreach ($output as $index => $line) {
+        //     if ($index > 0 && !empty($line)) {
+        //         $data = preg_split('/\s+/', $line);
+        //         $device = $data[0];
+        //         $freeSpace = $data[1];
+        //         $totalSize = $data[2];
+
+        //         $diskUsage[$device] = [
+        //             'freeSpace' => $freeSpace,
+        //             'totalSize' => $totalSize,
+        //         ];
+        //     }
+        // }
+
+        // // Print disk usage information
+        // foreach ($diskUsage as $device => $usage) {
+        //     $freeSpace = $usage['freeSpace'];
+        //     $totalSize = $usage['totalSize'];
+
+        //     echo "Device: $device\n";
+        //     echo "Free Space: convertToReadableSize($freeSpace) bytes\n";
+        //     echo "Total Size: convertToReadableSize($totalSize) bytes\n";
+        //     echo "-----------------------\n";
+        // }
+
+        // echo ByteUnits\parse('1.42MB')->add($totalSize)->format('kB/0000');
+
+        // exit;
+
         $breadcrumbs  = [
             [
                 'link' => "/dashboard",

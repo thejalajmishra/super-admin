@@ -11,9 +11,9 @@
                     <h1 class="m-0">{{$pagetitle??''}}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
-                    {{-- @can('roles create') --}}
+                    @can('roles.create')
                         <a href="{{ url('roles/create') }}" class="btn btn-success float-right">Add New <i class="nav-icon fas fa-plus"></i></a>
-                    {{-- @endcan --}}
+                    @endcan
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -79,12 +79,32 @@
                                                 <td>{{ $role->name }}</td>
                                                 <td>{{ $role->description }}</td>
                                                 <td>{{ $role->guard_name }}</td>
-                                                <td>{{ $role->created_at }}</td>
-                                                <td><span class="tag tag-success">Approved</span></td>
+                                                <td>{{ \Carbon\Carbon::parse($role->created_at)->format('jS F Y g:i:s A')}}</td>
                                                 <td>
-                                                    <a href="{{ url('roles/' . $role->id . '/edit') }}" title="Edit Role"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                                                    <a href="{{ url('roles/' . $role->id . '/delete') }}" title="Delete Role"><i class="fas fa-trash danger" aria-hidden="true"></i></a>
-                                                    <a href="{{ url('roles/' . $role->id . '/permissions') }}" title="Edit Role Permissions"><i class="fas fa-lock"></i></a>
+                                                    @if($role->deleted_at != NULL)
+                                                        <div class="bg-danger color-palette text-center">
+                                                            <span>Deleted</span>
+                                                        </div>
+                                                    @elseif($role->status != 1)
+                                                        <div class="bg-warning color-palette text-center">
+                                                            <span>In-Active</span>
+                                                        </div>
+                                                    @else
+                                                        <div class="bg-primary color-palette text-center">
+                                                            <span>Active</span>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @can('roles.edit')
+                                                        <a href="{{ url('roles/' . $role->id . '/edit') }}" title="Edit Role" class="btn btn-xs btn-info">Edit</a>
+                                                    @endcan
+                                                    @can('roles.delete')
+                                                        <a href="{{ url('roles/' . $role->id . '/delete') }}" title="Delete Role" class="btn btn-xs btn-danger" data-confirm-delete="true">Delete</a>
+                                                    @endcan
+                                                    {{-- @can('roles.permissions') --}}
+                                                        <a href="{{ url('roles/' . $role->id . '/permissions') }}" title="Edit Role Permissions" class="btn btn-xs btn-success">Permissions</a>
+                                                    {{-- @endcan --}}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -111,8 +131,8 @@
         <script>
             $(document).Toasts('create', {
                 title: 'Success',
-                position: 'topLeft',
-                body: '{{ session()->get('message') }}'
+                position: 'topRight',
+                body: "{{ session()->get('message') }}"
             });
         </script>
     @endif

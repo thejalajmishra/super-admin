@@ -83,7 +83,8 @@ class RoleController extends Controller
         $role = Role::create([
             'name' => $request->name, 
             'description'=> $request->description, 
-            'guard_name' => $request->guard_name
+            'guard_name' => $request->guard_name,
+            'status' => $request->status
         ]);
 
         $superadminRole = Role::where('name', 'superadmin')->first();
@@ -91,7 +92,7 @@ class RoleController extends Controller
 
         Notification::send($users, new RoleCreatedSuccessful($request->name));
 
-        return redirect('roles/lists');
+        return redirect('roles/lists')->with('message', "Role created successfully.");
     }
 
     /**
@@ -107,8 +108,25 @@ class RoleController extends Controller
      */
     public function edit(string $id)
     {
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/roles/lists",
+                'name' => "Roles List"
+            ],
+            [
+                'link' => "/roles/create",
+                'name' => "Roles Edit"
+            ]
+        ];
+        $pageTitle = 'Roles Edit';
         $roles = Role::find($id);
         return view('roles.edit', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
             'roles' => $roles
         ]);
     }
@@ -124,13 +142,14 @@ class RoleController extends Controller
             'guard_name' => 'required'
         ]);
 
-        $permission = Role::find($id);
-        $permission->name = $request->name; 
-        $permission->description = $request->description;
-        $permission->guard_name = $request->guard_name;
-        $permission->save();
+        $role = Role::find($id);
+        $role->name = $request->name; 
+        $role->description = $request->description;
+        $role->guard_name = $request->guard_name;
+        $role->status = $request->status;
+        $role->save();
 
-        return redirect('roles/lists');
+        return redirect('roles/lists')->with('message', "Role updated successfully.");
     }
 
     /**
@@ -138,7 +157,13 @@ class RoleController extends Controller
      */
     public function destroy(string $id)
     {
-        // 
+        $roles = Role::find($id);
+
+        if ($roles != null) {
+            $roles->delete($id);
+            return redirect()->back()->with('message', "Role deleted successfully.");
+        }
+        return redirect()->route('dashboard')->with(['message'=> 'Wrong ID!!']);   
     }
 
     /**
@@ -146,25 +171,41 @@ class RoleController extends Controller
      */
     public function permissions(string $id)
     {
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/roles/lists",
+                'name' => "Roles List"
+            ],
+            [
+                'link' => "/roles/".$id."/permissions",
+                'name' => "Roles Permissions"
+            ]
+        ];
+        $pageTitle = 'Roles Permissions';
+
         $roles = Role::find($id);
         $permissions = Permission::all();
         $result = array();
 
         foreach ($permissions as $key => $permission) {
-            $parts = explode(' ', $permission->name);
+            $parts = explode('.', $permission->name);
             $category = $parts[0] ?? '';
             $action = $parts[1] ?? '';
-        
             if (!isset($result[$category])) {
                 $result[$category] = array();
             }
-        
             $result[$category][] = $action;
         }
 
         $role_permissions = $roles->permissions->pluck('name')->toArray();
 
         return view('roles.permissions', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
             'roles' => $roles,
             'permissions' => $result,
             'role_permissions' => $role_permissions

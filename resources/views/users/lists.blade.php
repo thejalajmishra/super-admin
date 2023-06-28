@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('page-style')
     <link rel="stylesheet" href="/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
     <style>
         .table td {
             vertical-align: middle;
@@ -16,9 +17,9 @@
                     <h1 class="m-0">{{$pagetitle??''}}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
-                    {{-- @can('users create') --}}
+                    @can('users.create')
                         <a href="{{ url('users/create') }}" class="btn btn-success float-right">Add New <i class="nav-icon fas fa-plus"></i></a>
-                    {{-- @endcan --}}
+                    @endcan
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -35,10 +36,10 @@
                             <div class="card-tools">
                                 <form id="frm_filter">
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                        <div class="col-md-2">
+                                            <div class="input-group input-group-sm">
                                                 <select name="per_page" id="status" class="form-control frm_fields">
-                                                    <option {{ $request->per_page == '5' ? 'selected' : '' }} value="5">Per Page 5</option>
+                                                    <option {{ $request->per_page == '5' ? 'selected' : '' }} value="5">5 Per Page</option>
                                                     <option {{ $request->per_page == '10' ? 'selected' : '' }} value="10">Per Page 10</option>
                                                     <option {{ $request->per_page == '20' ? 'selected' : '' }} value="20">Per Page 20</option>
                                                     <option {{ $request->per_page == '50' ? 'selected' : '' }} value="50">Per Page 50</option>
@@ -48,7 +49,39 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-3">
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" name="daterange" id="daterange" value="{{$request->daterange}}" class="form-control frm_fields">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group input-group-sm">
+                                                <select name="roles" id="roles" class="form-control frm_fields">
+                                                    <option {{ $request->per_page == '5' ? 'selected' : '' }} value="">Role</option>
+                                                    @if($roles)
+                                                        @foreach($roles as $role)
+                                                            <option {{ $request->roles == $role->id ? 'selected' : '' }} value="{{$role->id}}">{{$role->name}}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group input-group-sm">
+                                                <select name="status" id="status" class="form-control frm_fields">
+                                                    <option value="">Status</option>
+                                                    <option {{ $request->status == '1' ? 'selected' : '' }} value="1">Active</option>
+                                                    <option {{ $request->status == '0' ? 'selected' : '' }} value="0">In-Active</option>
+                                                    <option {{ $request->status == '2' ? 'selected' : '' }} value="2">Deleted</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
                                             <div class="input-group input-group-sm" style="width: 150px;">
                                                 <input type="text" name="s" value="{{$request->s}}" class="form-control float-right frm_fields" placeholder="Search">
                                                 <div class="input-group-append">
@@ -74,13 +107,13 @@
                                         <th>Email</th>
                                         <th>Mobile</th>
                                         <th>Role</th>
-                                        <th>Date</th>
                                         <th>Status</th>
+                                        <th>Date Time</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($users)
+                                    @if (isset($users) && count($users) > 0)
                                         @foreach ($users as $key => $user)
                                             <tr>
                                                 <td>{{ $user->id }}</td>
@@ -102,15 +135,39 @@
                                                 <td>{{ $user->email }}</td>
                                                 <td>{{ $user->mobile }}</td>
                                                 <td>{{ $user->roles->pluck('name')[0] ?? '' }}</td>
-                                                <td>{{ $user->created_at }}</td>
-                                                <td><span class="tag tag-success">Approved</span></td>
                                                 <td>
-                                                    <a href="{{ url('users/' . $user->id . '/edit') }}" title="Edit User"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                                                    <a href="{{ url('users/' . $user->id . '/delete') }}" title="Delete User"><i class="fas fa-trash danger" aria-hidden="true"></i></a>
-                                                    <a href="{{ url('users/' . $user->id . '/permissions') }}" title="Edit User Permissions"><i class="fas fa-lock"></i></a>
+                                                    @if($user->deleted_at != NULL)
+                                                        <div class="bg-danger color-palette text-center">
+                                                            <span>Deleted</span>
+                                                        </div>
+                                                    @elseif($user->status != 1)
+                                                        <div class="bg-warning color-palette text-center">
+                                                            <span>In-Active</span>
+                                                        </div>
+                                                    @else
+                                                        <div class="bg-primary color-palette text-center">
+                                                            <span>Active</span>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($user->created_at)->format('jS F Y g:i:s A')}}</td>
+                                                <td>
+                                                    @can('users.edit')
+                                                        <a href="{{ url('users/' . $user->id . '/edit') }}" title="Edit User" class="btn btn-xs btn-info">Edit</a>
+                                                    @endcan
+                                                    @can('users.delete')
+                                                        <a href="{{ route('users.destroy', $user->id) }}" title="Delete User" class="btn btn-xs btn-danger" data-confirm-delete="true">Delete</a>
+                                                    @endcan
+                                                    @can('users.permissions')
+                                                        <a href="{{ url('users/' . $user->id . '/permissions') }}" title="Edit User Permissions" class="btn btn-xs btn-success">Permissions</a>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="10">No users found.</td>
+                                        </tr>
                                     @endif
                                 </tbody>
                             </table>
@@ -128,8 +185,9 @@
     <!-- /.content -->
 @endsection
 @section('page-script')
-    <!-- Toastr -->
     <script src="/plugins/toastr/toastr.min.js"></script>
+    <script src="/plugins/moment/moment.min.js"></script>
+    <script src="/plugins/daterangepicker/daterangepicker.js"></script>
     @if (session()->has('message'))
         <script>
             $(document).Toasts('create', {
@@ -140,6 +198,9 @@
         </script>
     @endif
     <script>
+        var startdate = moment().startOf("month");
+        var enddate = moment().endOf("month");
+        $('#daterange').daterangepicker();
         $(".frm_fields").on("change", function() {
             $("#frm_filter").submit();
         });

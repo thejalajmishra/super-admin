@@ -14,6 +14,13 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="/dist/css/adminlte.min.css">
     @yield('page-style')
+    @include('sweetalert::alert')
+    <style>
+        .notifications_dropdown_menu  .dropdown-item {
+            white-space: inherit !important;
+            line-height: 17px;
+        }
+    </style>
 </head>
 
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -150,7 +157,7 @@
                             @foreach (auth()->user()->unreadNotifications as $notification)
                                 <a href="{{url('/users/lists')}}" class="dropdown-item">
                                     <i class="fas fa-user mr-2"></i> {{$notification->data['data']}}
-                                    <span class="float-right text-muted text-sm">3 mins</span>
+                                    <span class="float-right text-muted text-sm">{{Carbon::parse($notification->created_at)->diffForHumans();}}</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
                             @endforeach

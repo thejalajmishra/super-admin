@@ -35,66 +35,88 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-                <li class="nav-item">
-                    <a href="{{url('dashboard')}}" class="nav-link {{ request()->routeIs('dashboard') ? "active" : '' }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
-                <li class="nav-item {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? "menu-open" : '' }}">
-                    <a href="#" class="nav-link {{ request()->routeIs('users.*') ? "active" : '' }}">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>
-                            Users
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{url('users/lists')}}" class="nav-link {{ request()->routeIs('users.*') ? "active" : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Users</p>
-                            </a>
-                        </li>
-                        @if(auth()->check() && isset(auth()->user()->roles->pluck('name')[0]) && auth()->user()->roles->pluck('name')[0] == 'superadmin')
+                @can('dashboard.index')
+                    <li class="nav-item">
+                        <a href="{{url('dashboard')}}" class="nav-link {{ request()->routeIs('dashboard') ? "active" : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                @endcan
+                @can('users.index')
+                    <li class="nav-item {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? "menu-open" : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*')  ? "active" : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>
+                                Users
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{url('roles/lists')}}" class="nav-link {{ request()->routeIs('roles.*') ? "active" : '' }}">
+                                <a href="{{url('users/lists')}}" class="nav-link {{ request()->routeIs('users.*') ? "active" : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Roles</p>
+                                    <p>Users</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{url('permissions/lists')}}" class="nav-link {{ request()->routeIs('permissions.*') ? "active" : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Permissions</p>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-cog"></i>
-                        <p>
-                            Settings
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="./index.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Site Settings</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./index2.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Email Settings</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                            @if(auth()->check() && isset(auth()->user()->roles->pluck('name')[0]) && auth()->user()->roles->pluck('name')[0] == 'superadmin')
+                                @can('roles.index')
+                                    <li class="nav-item">
+                                        <a href="{{url('roles/lists')}}" class="nav-link {{ request()->routeIs('roles.*') ? "active" : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Roles</p>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('permissions.index')
+                                    <li class="nav-item">
+                                        <a href="{{url('permissions/lists')}}" class="nav-link {{ request()->routeIs('permissions.*') ? "active" : '' }}">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Permissions</p>
+                                        </a>
+                                    </li>
+                                @endcan
+                            @endif
+                        </ul>
+                    </li>
+                @endcan
+                @can('calendars.index')
+                    <li class="nav-item">
+                        <a href="{{url('calendars/lists')}}" class="nav-link {{ request()->routeIs('calendars.*') ? "active" : '' }}">
+                            <i class="nav-icon far fa-calendar-alt"></i>
+                            <p>Calendars</p>
+                        </a>
+                    </li>
+                @endcan
+                @can('settings.index')
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>
+                                Settings
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('settings.site')
+                                <li class="nav-item">
+                                    <a href="./index.html" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Site Settings</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('settings.email')
+                                <li class="nav-item">
+                                    <a href="./index2.html" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Email Settings</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
                 <li class="nav-item">
                     <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
                         <i class="nav-icon fas fa-tachometer-alt"></i>

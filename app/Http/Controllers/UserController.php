@@ -10,7 +10,9 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Notifications\UserCreatedSuccessful;
 use Illuminate\Support\Facades\Notification;
+Use Alert;
 use Mail;
+use Auth;
 
 class UserController extends Controller
 {
@@ -43,11 +45,30 @@ class UserController extends Controller
             $users = $users->orWhere('email', $request->s);
             $users = $users->orWhere('mobile', $request->s);
         }
+        if(isset($request->status) && $request->status != ''){
+            if($request->status == '2'){
+                $users = $users->where('deleted_at', '!=', NULL);
+            } else {
+                $users = $users->where('status', $request->status);
+            }
+        }
+
+        $user = Auth::user();
+        if($user->hasRole('superadmin')){
+            $users = $users->withTrashed();
+        }
+
         $users = $users->paginate($per_page);
+        $roles = Role::all();
+        $title = 'Delete User!';
+        $text = "Are you sure you want to delete?";
+        confirmDelete($title, $text);
+
         return view('users/lists', [
             'breadcrumbs' => $breadcrumbs,
             'pagetitle' => $pageTitle,
             'users' => $users,
+            'roles' => $roles,
             'request' => $request
         ]);
     }
@@ -253,25 +274,41 @@ class UserController extends Controller
      */
     public function permissions(string $id)
     {
+        $breadcrumbs  = [
+            [
+                'link' => "/dashboard",
+                'name' => "Dashboard"
+            ],
+            [
+                'link' => "/users/lists",
+                'name' => "Users List"
+            ],
+            [
+                'link' => "/users/".$id."/permissions",
+                'name' => "Roles Permissions"
+            ]
+        ];
+        $pageTitle = 'Users Permissions';
+
         $users = User::find($id);
         $permissions = Permission::all();
         $result = array();
 
         foreach ($permissions as $key => $permission) {
-            $parts = explode(' ', $permission->name);
+            $parts = explode('.', $permission->name);
             $category = $parts[0] ?? '';
             $action = $parts[1] ?? '';
-        
             if (!isset($result[$category])) {
                 $result[$category] = array();
             }
-        
             $result[$category][] = $action;
         }
 
         $user_permissions = $users->permissions->pluck('name')->toArray();
 
         return view('users.permissions', [
+            'breadcrumbs' => $breadcrumbs,
+            'pagetitle' => $pageTitle,
             'users' => $users,
             'permissions' => $result,
             'user_permissions' => $user_permissions
@@ -283,19 +320,13 @@ class UserController extends Controller
      */
     public function update_permissions(Request $request, string $id)
     {
-        $request->validate([
-            'permissions' => 'required'
-        ]);
-
         $user = User::find($id);
         $user->syncPermissions($request->permissions);
-
         return redirect('users/lists');
     }
 
     public function search(Request $request) {
         $results = User::search('jalaj')->get();
-
         dd($results);
     }
 }
