@@ -89,8 +89,8 @@
                     </li>
                 @endcan
                 @can('settings.index')
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item {{ request()->routeIs('settings.*') ? "menu-open" : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('settings.*')  ? "active" : '' }}">
                             <i class="nav-icon fas fa-cog"></i>
                             <p>
                                 Settings
@@ -100,7 +100,7 @@
                         <ul class="nav nav-treeview">
                             @can('settings.site')
                                 <li class="nav-item">
-                                    <a href="./index.html" class="nav-link">
+                                    <a href="{{url('settings/site')}}" class="nav-link {{ request()->routeIs('settings.site') ? "active" : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Site Settings</p>
                                     </a>
@@ -108,7 +108,7 @@
                             @endcan
                             @can('settings.email')
                                 <li class="nav-item">
-                                    <a href="./index2.html" class="nav-link">
+                                    <a href="{{url('settings/email')}}" class="nav-link {{ request()->routeIs('settings.email') ? "active" : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Email Settings</p>
                                     </a>

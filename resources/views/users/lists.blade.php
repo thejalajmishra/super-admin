@@ -102,8 +102,7 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Profile</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
+                                        <th>Name</th>
                                         <th>Email</th>
                                         <th>Mobile</th>
                                         <th>Role</th>
@@ -130,22 +129,21 @@
                                                         @endif
                                                     @endif
                                                 </td>
-                                                <td>{{ $user->first_name }}</td>
-                                                <td>{{ $user->last_name }}</td>
+                                                <td>{{ $user->first_name }} {{ $user->last_name }}</td>
                                                 <td>{{ $user->email }}</td>
                                                 <td>{{ $user->mobile }}</td>
                                                 <td>{{ $user->roles->pluck('name')[0] ?? '' }}</td>
                                                 <td>
                                                     @if($user->deleted_at != NULL)
-                                                        <div class="bg-danger color-palette text-center">
+                                                        <div class="btn btn-xs btn-danger">
                                                             <span>Deleted</span>
                                                         </div>
                                                     @elseif($user->status != 1)
-                                                        <div class="bg-warning color-palette text-center">
+                                                        <div class="btn btn-xs btn-warning">
                                                             <span>In-Active</span>
                                                         </div>
                                                     @else
-                                                        <div class="bg-primary color-palette text-center">
+                                                        <div class="btn btn-xs btn-success">
                                                             <span>Active</span>
                                                         </div>
                                                     @endif
@@ -190,10 +188,15 @@
     <script src="/plugins/daterangepicker/daterangepicker.js"></script>
     @if (session()->has('message'))
         <script>
-            $(document).Toasts('create', {
-                title: 'Success',
-                position: 'topLeft',
-                body: '{{ session()->get('message') }}'
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            Toast.fire({
+                icon: 'success',
+                title: '{{ session()->get("message") }}'
             });
         </script>
     @endif

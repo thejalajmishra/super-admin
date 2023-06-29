@@ -58,7 +58,7 @@ class UserController extends Controller
             $users = $users->withTrashed();
         }
 
-        $users = $users->paginate($per_page);
+        $users = $users->orderBy('id', 'desc')->paginate($per_page);
         $roles = Role::all();
         $title = 'Delete User!';
         $text = "Are you sure you want to delete?";
@@ -177,7 +177,7 @@ class UserController extends Controller
         ];
         $pageTitle = 'Users Edit';
         $roles = Role::all();
-        $users = User::find($id);
+        $users = User::withTrashed()->find($id);
         return view('users/edit', [
             'breadcrumbs' => $breadcrumbs,
             'pagetitle' => $pageTitle,
@@ -204,7 +204,7 @@ class UserController extends Controller
             'role' => 'required',
         ]);
 
-        $users = User::find($id);
+        $users = User::withTrashed()->find($id);
         $users->first_name = $request->first_name;
         $users->last_name = $request->last_name;
         $users->email = $request->email;
@@ -222,6 +222,7 @@ class UserController extends Controller
             $users->profile_picture = $location.'/'.$filename;
         }
         $users->login_allowed = $request->login_allowed ?? 0;
+        $users->deleted_at = NULL;
         $users->save();
 
         $users->roles()->detach();

@@ -82,15 +82,15 @@
                                                 <td>{{ \Carbon\Carbon::parse($role->created_at)->format('jS F Y g:i:s A')}}</td>
                                                 <td>
                                                     @if($role->deleted_at != NULL)
-                                                        <div class="bg-danger color-palette text-center">
+                                                        <div class="btn btn-xs btn-danger">
                                                             <span>Deleted</span>
                                                         </div>
                                                     @elseif($role->status != 1)
-                                                        <div class="bg-warning color-palette text-center">
+                                                        <div class="btn btn-xs btn-warning">
                                                             <span>In-Active</span>
                                                         </div>
                                                     @else
-                                                        <div class="bg-primary color-palette text-center">
+                                                        <div class="btn btn-xs btn-success">
                                                             <span>Active</span>
                                                         </div>
                                                     @endif
@@ -129,10 +129,15 @@
     <script src="/plugins/toastr/toastr.min.js"></script>
     @if (session()->has('message'))
         <script>
-            $(document).Toasts('create', {
-                title: 'Success',
-                position: 'topRight',
-                body: "{{ session()->get('message') }}"
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            Toast.fire({
+                icon: 'success',
+                title: '{{ session()->get("message") }}'
             });
         </script>
     @endif

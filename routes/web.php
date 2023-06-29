@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -22,7 +23,7 @@ use Spatie\Permission\Models\Permission;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 
@@ -113,6 +114,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::group(['middleware' => ['role_or_permission:superadmin|calendars.delete']], function () {
         Route::delete('calendars/{id}/delete', [CalendarController::class, 'destroy'])->name('calendars.destroy');
+    });
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::group(['middleware' => ['role_or_permission:superadmin|settings.index']], function () {
+        Route::get('settings/site', [SettingController::class, 'index'])->name('settings.site');
+    });
+    Route::group(['middleware' => ['role_or_permission:superadmin|settings.index']], function () {
+        Route::get('settings/email', [SettingController::class, 'index'])->name('settings.email');
+    });
+    Route::group(['middleware' => ['role_or_permission:superadmin|settings.create']], function () {
+        Route::get('settings/create', [SettingController::class, 'create'])->name('settings.create');
+        Route::post('settings/store', [SettingController::class, 'store'])->name('settings.store');
+    });
+    Route::group(['middleware' => ['role_or_permission:superadmin|settings.edit']], function () {
+        Route::get('settings/{id}/edit/', [SettingController::class, 'edit'])->name('settings.edit');
+        Route::post('settings/update/{id}', [SettingController::class, 'update'])->name('settings.update');
+    });
+    Route::group(['middleware' => ['role_or_permission:superadmin|settings.delete']], function () {
+        Route::delete('settings/{id}/delete', [SettingController::class, 'destroy'])->name('settings.destroy');
     });
 });
 
