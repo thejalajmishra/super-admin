@@ -31,6 +31,7 @@ class PermissionController extends Controller
             $permissions = $permissions->where('name', $request->s);
             $permissions = $permissions->orWhere('description', $request->s);
         }
+        $permissions = $permissions->orderBy('id', 'DESC');
         $permissions = $permissions->paginate($per_page);
         return view('permissions.lists', [
             'breadcrumbs' => $breadcrumbs,

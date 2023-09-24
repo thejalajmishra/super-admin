@@ -11,7 +11,17 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                @if (isset(Auth::user()->profile_picture) && !empty(Auth::user()->profile_picture))
+                    <img src="/{{ Auth::user()->profile_picture }}" class="img-circle elevation-2" height="40" width="40" />
+                @else
+                    @if (Auth::user()->gender == 'M')
+                        <img src="/dist/img/avatar5.png" class="img-circle elevation-2" height="40" width="40" />
+                    @elseif (Auth::user()->gender == 'F')
+                        <img src="/dist/img/avatar2.png" class="img-circle elevation-2" height="40" width="40" />
+                    @else
+                        <img src="/dist/img/avatar.png" class="img-circle elevation-2" height="40" width="40" />
+                    @endif
+                @endif
             </div>
             <div class="info">
                 <a href="{{url('profile')}}" class="d-block">{{Auth::user()->first_name}} {{Auth::user()->last_name}}</a>
