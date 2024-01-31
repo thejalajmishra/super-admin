@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 // use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 // use Laravel\Scout\Searchable;
@@ -128,5 +128,9 @@ class User extends Authenticatable
             'mobile',
             'gender',
         ];
+    }
+
+    public function getAuthIdentifierName() {
+        return 'mobile';
     }
 }
